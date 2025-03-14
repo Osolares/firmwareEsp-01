@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wifi Config</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+</head>
+<body>
+
+    <h1><span class="col-sm-offset-5 label label-default text-center">Configurar Wifi</span></h1>
+    <br><br><br>
+    <h4><span class=" text-center">SSID E IP CONFIGURADA :      %MI_IP%</span></h4>
+
+    <br><br>
+
+    <form class="form-horizontal" action='save_conf' method='get'>
+
+    <div class=" form-group">
+        <label for="inputSSID" class="col-sm-offset-2 col-sm-2 control-label" >SSID</label>
+        <div class="col-sm-4">
+        <input class=' form-control' name='ssid' type='text' placeholder="SSID"><br>
+    </div>
+    </div>
+
+
+    <div class="form-group">
+    <label for="inputPassword3" class="col-sm-offset-2 col-sm-2 control-label">Password</label>
+    <div class="col-sm-4">
+    <input class='form-control' name='pass' type='password' placeholder="Password">
+    </div>
+    </div>
+
+    <br><br>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="col-sm-offset-2 btn-lg btn-primary" value='GUARDAR'>Guardar</button>
+    </div>
+  </div>
+    </form>
+
+<br><br><br>
+  <div class="form-group">
+<div class="col-sm-offset-4 col-sm-4 ">
+<button type="button" class="btn btn-success btn-lg btn-block" onclick=location.href="/" >Menu Principal</button>
+</div>
+</div>
+<br><br><br>
+  <div class="form-group">
+<div class="col-sm-offset-4 col-sm-4 ">
+<button type="button" class="btn btn-primary btn-lg btn-block" onclick=location.href="/scan" >Escanear Redes
+</button>
+</div>
+</div>
+
+
+<!--
+    <form action='save_conf' method='get'>
+    SSID:<br><br>
+    <input class='input1' name='ssid' type='text'><br>
+    PASSWORD:<br><br>
+    <input class='input1' name='pass' type='password'><br><br>"
+    <input class='boton' type='submit' value='GUARDAR'/><br><br>
+    </form>
+    <a href='escan'><button class='boton'>ESCANEAR</button></a><br><br>;
+
+
+<form class="form-horizontal" action='save_conf' method='GET'>
+  <div class="form-group">
+    <label for="inputSSID" class="col-sm-2 control-label" >SSID</label>
+    <div class="col-sm-6">
+     <!-- <input type="text" class="form-control" name'ssid' id="inputEmail3" placeholder="SSID"> --
+    <input type="text" class="form-control" id="ssid" placeholder="SSID">
+
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+    <div class="col-sm-6">
+    <!--  <input type="password" class="form-control" name'pass' id="inputPassword3" placeholder="Password"> --
+    <input type="password" class="form-control" id="pass" placeholder="Password">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="btn-lg btn-primary" value='GUARDAR'>Guardar</button>
+
+    </div>
+  </div>
+
+ -->
+
+</form>
+
+<div class="col-sm-offset-4 col-sm-4 ">
+<button type="button" class="btn btn-danger btn-lg btn-block" onclick=location.href="/restart" >Reiniciar Controlador</button>
+</div>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+    <title>ConfigDevice</title>
+    <script>
+        function loadWifiData() {
+            fetch('/getWifiData')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ssid').value = data.ssid;
+                    document.getElementById('password').value = data.password;
+
+
+                });
+        }
+
+            function loadCredentialsData() {
+                fetch('/getCredentialsData')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('dId').value = data.dId;
+                        document.getElementById('webhook_pass').value = data.webhook_pass;
+                        document.getElementById('webhook_ep').value = data.webhook_ep;
+                        document.getElementById('mqtt_server').value = data.mqtt_server;
+                        //document.getElementById('print_stats').value = data.print_stats;
+
+                        // Establecer la opción seleccionada en el <select> según print_stats
+                        const printStatsSelect = document.getElementById('print_stats');
+                        printStatsSelect.value = data.print_stats === "true" ? "true" : "false";
+                        //alert(data.print_stats);
+                        //alert(printStatsSelect);
+
+                    });
+            }
+
+
+        function scanWifi() {
+            fetch('/scan')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('wifiList').innerHTML = data;
+                });
+        }
+
+        function selectSSID(ssid) {
+            document.getElementById('ssid').value = ssid;
+        }
+
+        function saveWifi() {
+            let ssid = document.getElementById('ssid').value;
+            let password = document.getElementById('password').value;
+
+            fetch('/saveWifi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `ssid=${ssid}&password=${password}`
+            }).then(() => alert("Configuración guardada. Por favor, reinicie el Dispositivo manualmente."));
+        }
+
+            function saveCredentials() {
+                let dId = document.getElementById('dId').value;
+                let webhook_pass = document.getElementById('webhook_pass').value;
+                let webhook_ep = document.getElementById('webhook_ep').value;
+                let mqtt_server = document.getElementById('mqtt_server').value;
+                let print_stats = document.getElementById('print_stats').value;
+
+                fetch('/saveCredentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `dId=${dId}&print_stats=${print_stats}&webhook_pass=${webhook_pass}&webhook_ep=${webhook_ep}&mqtt_server=${mqtt_server}`
+                }).then(() => alert("Configuración guardada. Por favor, reinicie el Dispositivo manualmente."));
+            }
+
+            function restartESP() {
+                    if (confirm("⚠️ ¿Seguro que quieres reiniciar el dispositivo?")) {
+                        fetch('/restart')
+                            .then(response => response.text())
+                            .then(data => {
+                                alert(data);
+                            });
+                    }
+                }
+
+
+    window.addEventListener("load", loadWifiData);
+    window.addEventListener("load", loadCredentialsData);
+
+    </script>
+</head>
+
+<body>
+        <div class="container text-center  ">
+            <h1><span class=" label label-default text-center">Bienvenido a la Configuración </span></h1>
+            <h1><span class=" label label-default text-center">del Dispositivo</span></h1>
+
+        </div>
+
+<div class="container col-md-6  col-sm-offset-3">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 class="panel-title text-center">Configurar WiFi</h2>
+        </div>
+        <div class="panel-body">
+    <div class="row">
+        <label class="form-label " for="ssid"   >SSID:</label>
+        <input  class="col-xs-4 form-control " type="text" id="ssid"><br>
+    </div>
+    <div class="row">
+    
+        <label class="control-label  " for="password" >Password:</label>
+        <input class="col-xs-4 form-control " type="text" id="password"><br>
+    </div>
+    <br>
+    <div class="row text-center">
+        <button class=" btn btn-primary" onclick="saveWifi()">Guardar Configuración WiFi</button>
+    </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container col-md-6  col-sm-offset-3">
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h2 class="panel-title text-center">Configurar Credenciales</h2>
+
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <label class="form-label " for="dId">dId:</label>
+                <input class="col-xs-4 form-control " type="text" id="dId"><br>
+            </div>
+            <div class="row">
+                <label class="control-label  " for="webhook_pass">WEBHOOK PASSWORD:</label>
+                <input class="col-xs-4 form-control " type="text" id="webhook_pass"><br>
+            </div>
+            <div class="row">
+                <label class="control-label  " for="webhook_ep">WEBHOOK END POINT:</label>
+                <input class="col-xs-4 form-control " type="text" id="webhook_ep"><br>
+            </div>
+            <div class="row">
+                <label class="control-label  " for="mqtt_server">MQTT SERVER:</label>
+                <input class="col-x s-4 form-control " type="text" id="mqtt_server"><br>
+            </div>
+
+            <label class="control-label" for="print_stats">Imprimir Monitor:</label>
+            <select class=" btn-info btn-lg "  name="print_stats" id="print_stats">
+                <option value="true">On</option>
+                <option value="false">Off</option>
+            </select>
+            
+            <br>
+            
+            <div class="row text-center">
+                <button class=" btn btn-success" onclick="saveCredentials()">Guardar Credenciales</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<br><br>
+            <div class="container row ">
+            <h2><span class=" label label-default text-center">Redes Disponibles:</span></h2>
+
+            <div id="wifiList"></div>
+        <button class="col-sm-offset-2 btn-lg btn-warning" onclick="scanWifi()">Escanear redes</button>
+
+            </div>
+
+            <br>
+
+            <div class="container row text-center ">
+            
+                <button class="col-sm-offset-2 btn-lg btn-primary " onclick=location.href="/">Menú Principal</button>
+            
+            </div>
+            <br>
+
+
+
+            <div class="container row text-center ">
+            
+                <button class="col-sm-offset-2 btn-lg btn-danger" onclick="restartESP()">Reiniciar Dispositivo</button>
+            
+            </div>
+</body>
+
+</html>

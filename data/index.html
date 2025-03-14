@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Server esp8266</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container text-center  ">
+    <h1><span class=" label label-default text-center">Bienvenido</span></h1>
+    </div>
+<br><br><br>
+
+
+<div class="col-sm-offset-4 col-sm-4 ">
+<button type="button" class="btn btn-primary btn-lg btn-block" onclick=location.href="/config" >Configurar Red y Credenciales</button>
+</div>
+<br><br><br>
+
+<div class="col-sm-offset-4 col-sm-4 ">
+<button type="button" class="btn btn-warning btn-lg btn-block" onclick=location.href="/device_config" >Configurar Dispositivo</button>
+</div>
+<br><br><br>
+
+<div class="col-sm-offset-4 col-sm-4 ">
+<button type="button" class="btn btn-success btn-lg btn-block" onclick=location.href="/dashboard" >Dashboard</button>
+</div>
+<br><br><br>
+
+<div class="col-sm-offset-4 col-sm-4 ">
+<button type="button" class="btn btn-danger btn-lg btn-block" onclick="restartESP()" >Reiniciar Controlador</button>
+</div>
+
+        
+</body>
+</html>
+<script>
+        function restartESP() {
+            if (confirm("⚠️ ¿Seguro que quieres reiniciar el dispositivo?")) {
+                fetch('/restart')
+                    .then(response => response.text())
+                    .then(data => {
+                        alert(data);
+                    });
+            }
+        }
+
+</script>

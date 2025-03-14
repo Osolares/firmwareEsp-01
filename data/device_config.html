@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Server esp8266</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container text-center  ">
+    <h1><span class=" label label-default text-center">Bienvenido a la configuracion</span></h1>
+    <h1><span class=" label label-default text-center">de su dispositivo</span></h1>
+
+    </div>
+    <br><br>
+<div class="container col-md-10 text-center col-sm-offset-1">
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2 class="panel-title text-center">Configuracion de Reles y Dispositivos</h2>
+  </div>
+  <div class="panel-body">
+  </div>
+
+
+  <!-- Table 1-->
+  <table class="table">
+<!-- On rows -->
+<tr class="danger">Configuracion de Reles y Dispositivos</tr>
+
+<!-- On cells (`td` or `th`) -->
+<tr>
+  <td class="success">
+
+<div class="btn-group" role="group" aria-label="...">
+    <p >Modo Automatico</p>
+  <button type="button" class="btn-sm btn-primary"  onclick=location.href="/config_disp?auto=on">ACTIVAR </button>
+  <button type="button" class="btn-sm btn-danger"  onclick=location.href="/config_disp?auto=off">DESACTIVAR</button>
+  <p class="titulo">Estado: %ESTADO_AUTO%</p>
+
+</div>
+
+  </td>
+  <td class="warning">
+    <div class="btn-group" role="group" aria-label="...">
+    <p >Bomba</p>
+  <button type="button" class="btn-sm btn-primary"  onclick=location.href="/config_disp?bomba=on">ACTIVAR </button>
+  <button type="button" class="btn-sm btn-danger"  onclick=location.href="/config_disp?bomba=off">DESACTIVAR</button>
+  <p class="titulo">Estado: %ESTADO_BOMBA%</p>
+
+</div>
+
+  </td>
+
+</tr>
+
+  </table>
+
+<br><br>
+
+  <!-- Table 3-->
+  <table class="table">
+<!-- On rows -->
+<tr class="danger">Configuracion de alarmas</tr>
+
+<!-- On cells (`td` or `th`) -->
+<tr>
+  <td class="danger">
+<div class="btn-group" role="group" aria-label="...">
+    <p > Rele 1</p>
+  <button type="button" class="btn-sm btn-primary"  onclick=location.href="/config_disp?rele1=on">Activar </button>
+  <button type="button" class="btn-sm btn-danger"  onclick=location.href="/config_disp?rele1=off">Desactivar</button>
+          <p class="titulo">Estado: %ESTADO_RELE1%</p>
+
+</div>    
+  </td>
+
+  <td class="success">
+        <div class="btn-group" role="group" aria-label="...">
+    <p > Rele 2</p>
+  <button type="button" class="btn-sm btn-primary"  onclick=location.href="/config_disp?rele2=on">Encender </button>
+  <button type="button" class="btn-sm btn-danger"  onclick=location.href="/config_disp?rele2=off">Apagar</button>
+          <p class="titulo">Estado: %ESTADO_RELE2%</p>
+
+    </div>
+
+  </td>
+  <td class="warning">
+        <div class="btn-group" role="group" aria-label="...">
+    <p > Rele 3</p>
+  <button type="button" class="btn-sm btn-primary"  onclick=location.href="/config_disp?rele3=on">Encender </button>
+  <button type="button" class="btn-sm btn-danger"  onclick=location.href="/config_disp?rele3=off">Apagar</button>
+          <p class="titulo">Estado: %ESTADO_RELE3%</p>
+
+    </div>
+
+  </td>
+</tr>
+
+
+<!-- On cells (`td` or `th`) -->
+<tr>
+  <td class="warning">
+        <div class="btn-group" role="group" aria-label="...">
+    <p > Rele 4</p>
+  <button type="button" class="btn-sm btn-primary"  onclick=location.href="/config_disp?rele4=on">Encender </button>
+  <button type="button" class="btn-sm btn-danger"  onclick=location.href="/config_disp?rele4=off">Apagar</button>
+          <p class="titulo">Estado: %ESTADO_RELE4%</p>
+
+    </div>     
+  </td>
+</tr>
+
+
+
+  </table>
+
+    <!-- Table 3-->
+  <table class="table">
+<!-- On rows
+<tr class="danger">Configuracion de Reles y Dispositivos</tr>
+
+<!-- On cells (`td` or `th`) -->
+<tr>
+  <td class="success">
+
+
+  </td>
+  <td class="warning">
+
+
+  </td>
+  <td class="danger">
+   
+  </td>
+</tr>
+
+
+  </table>
+
+</div>    
+</div>
+
+
+<div class="container col-md-5 col-sm-offset-1">
+<div class="panel panel-success">
+  <div class="panel-heading">
+    <h2 class="panel-title text-center">Configuracion de Alarmas</h2>
+  </div>
+  <div class="panel-body">
+
+  <div class="btn-group text-center col-md-6 col-sm-offset-3" role="group" aria-label="...">
+    <p >Alarma 1</p>
+  <button type="button" class="btn-sm btn-primary"  onclick=location.href="/config_disp?alarma1=on">Activar </button>
+  <button type="button" class="btn-sm btn-danger"  onclick=location.href="/config_disp?alarma1=off">Desactivar</button>
+          <p class="titulo">Estado: %ESTADO_ALARMA1%</p>
+
+    </div> 
+
+<form class="form-horizontal " action='save_alarm1' method='get' >
+
+<div class=" form-group has-success ">
+  <label class="control-label " for="input_duracion">Selecciona el Tiempo de funcionamiento</label>
+  <select class="col-xs-4 form-control " name='duracion' id="input_duracion">
+  <option>1</option>
+  <option>5</option>
+  <option>10</option>
+  <option>15</option>
+  <option>20</option>
+  <option>25</option>
+  <option>30</option>
+  <option>45</option>
+</select>
+
+  <span id="helpBlock2" class="help-block">El tiempo de funcionamiento sera definido en minutos</span>
+</div>
+
+<div class="row">
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_domingo">Domingo </label>
+  <label>
+    <input type="radio" name="domingo" id="radio_domingo" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="domingo" id="radio_domingo" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_lunes">Lunes </label>
+  <label>
+    <input type="radio" name="lunes" id="radio_lunes" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="lunes" id="radio_lunes" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_martes">Martes </label>
+  <label>
+    <input type="radio" name="martes" id="radio_martes" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="martes" id="radio_martes" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_miercoles">Miercoles </label>
+  <label>
+    <input type="radio" name="miercoles" id="radio_miercoles" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="miercoles" id="radio_miercoles" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_jueves">Jueves </label>
+  <label>
+    <input type="radio" name="jueves" id="radio_jueves" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="jueves" id="radio_jueves" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_viernes">Viernes </label>
+  <label>
+    <input type="radio" name="viernes" id="radio_viernes" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="viernes" id="radio_viernes" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_sabado">Sabado </label>
+  <label>
+    <input type="radio" name="sabado" id="radio_sabado" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="sabado" id="radio_sabado" value="off" >OFF
+  </label>
+</div>
+
+<br> <br>
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_sabado">Bomba </label>
+  <label>
+    <input type="radio" name="bomba" id="radio_bomba" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="bomba" id="radio_bomba" value="off" >OFF
+  </label>
+</div>
+
+
+<br><br>
+<h2 class="panel-title text-center">Utiliza el formato de 24hrs para la hora</h2>
+<div class="row">
+  <div class="col-xs-3 text-center">
+    <label class="control-label " for="input_hora">Hora</label>
+    <input type="number" class="form-control" name='hora' id='input_hora' placeholder="HH"> 
+  </div>
+  <div class="col-xs-3 text-center">
+    <label class="control-label" for="input_min">Minutos</label>
+    <input type="number" class="form-control" name='min' id='input_min' placeholder="MM">
+  </div>
+  <div class="col-xs-3 text-center">
+    <label class="control-label" for="input_seg">Segundos</label>
+    <input type="number" class="form-control" name='seg' id='input_seg' placeholder="SS">
+  </div>
+</div>
+</div>
+
+
+
+
+    <br><br>
+
+              <p class="titulo">Configuracion: %ALARMA1%</p>
+
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="col-sm-offset-2 btn-lg btn-primary" value='GUARDAR'>Guardar Configuracion</button>
+    </div>
+  </div>
+</form>
+  </div>
+
+
+</div>    
+</div>
+
+<div class="container col-md-5 ">
+<div class="panel panel-success">
+  <div class="panel-heading">
+    <h2 class="panel-title text-center">Configuracion de Alarmas</h2>
+  </div>
+  <div class="panel-body">
+
+  <div class="btn-group text-center col-md-6 col-sm-offset-3" role="group" aria-label="...">
+    <p >Alarma 2</p>
+  <button type="button" class="btn-sm btn-primary"  onclick=location.href="/config_disp?alarma2=on">Activar </button>
+  <button type="button" class="btn-sm btn-danger"  onclick=location.href="/config_disp?alarma2=off">Desactivar</button>
+          <p class="titulo">Estado: %ESTADO_ALARMA2%</p>
+
+    </div> 
+
+<form class="form-horizontal " action='save_alarm2' method='get' >
+
+<div class=" form-group has-success ">
+  <label class="control-label " for="input_duracion">Selecciona el Tiempo de funcionamiento</label>
+  <select class="col-xs-4 form-control " name='duracion' id="input_duracion">
+  <option>1</option>
+  <option>5</option>
+  <option>10</option>
+  <option>15</option>
+  <option>20</option>
+  <option>25</option>
+  <option>30</option>
+  <option>45</option>
+</select>
+
+  <span id="helpBlock2" class="help-block">El tiempo de funcionamiento sera definido en minutos</span>
+</div>
+
+<div class="row">
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_domingo">Domingo </label>
+  <label>
+    <input type="radio" name="domingo" id="radio_domingo" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="domingo" id="radio_domingo" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_lunes">Lunes </label>
+  <label>
+    <input type="radio" name="lunes" id="radio_lunes" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="lunes" id="radio_lunes" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_martes">Martes </label>
+  <label>
+    <input type="radio" name="martes" id="radio_martes" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="martes" id="radio_martes" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_miercoles">Miercoles </label>
+  <label>
+    <input type="radio" name="miercoles" id="radio_miercoles" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="miercoles" id="radio_miercoles" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_jueves">Jueves </label>
+  <label>
+    <input type="radio" name="jueves" id="radio_jueves" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="jueves" id="radio_jueves" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_viernes">Viernes </label>
+  <label>
+    <input type="radio" name="viernes" id="radio_viernes" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="viernes" id="radio_viernes" value="off" >OFF
+  </label>
+</div>
+
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_sabado">Sabado </label>
+  <label>
+    <input type="radio" name="sabado" id="radio_sabado" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="sabado" id="radio_sabado" value="off" >OFF
+  </label>
+</div>
+<br> <br>
+<div class="radio btn-lg">
+  <label class="col-xs-4" for="radio_sabado">Bomba </label>
+  <label>
+    <input type="radio" name="bomba" id="radio_bomba" value="on" checked>ON
+  </label>
+    <label>
+    <input type="radio" name="bomba" id="radio_bomba" value="off" >OFF
+  </label>
+</div>
+
+
+<br><br>
+    <h2 class="panel-title text-center">Utiliza el formato de 24hrs para la hora</h2>
+<div class="row">
+  <div class="col-xs-3 text-center">
+    <label class="control-label " for="input_hora">Hora</label>
+    <input type="number" class="form-control" name='hora' id='input_hora' placeholder="HH"> 
+  </div>
+  <div class="col-xs-3 text-center">
+    <label class="control-label" for="input_min">Minutos</label>
+    <input type="number" class="form-control" name='min' id='input_min' placeholder="MM">
+  </div>
+  <div class="col-xs-3 text-center">
+    <label class="control-label" for="input_seg">Segundos</label>
+    <input type="number" class="form-control" name='seg' id='input_seg' placeholder="SS">
+  </div>
+</div>
+</div>
+
+
+
+
+    <br><br>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="col-sm-offset-2 btn-lg btn-primary" value='GUARDAR'>Guardar Configuracion</button>
+    </div>
+  </div>
+</form>
+  </div>
+
+
+</div>    
+</div>
+
+<br><br><br>
+<div class="col-sm-offset-4 col-sm-4 ">
+<button type="button" class="btn btn-success btn-lg btn-block" onclick=location.href="/" >Menu Principal</button>
+<br><br>
+
+<div class="col-sm-offset-4 col-sm-4 ">
+<button type="button" class="btn btn-danger btn-lg btn-block" onclick=location.href="/restart" >Reiniciar Controlador</button>
+</div>
+<br><br><br>
+
+</div>
+
+        
+</body>
+</html>
