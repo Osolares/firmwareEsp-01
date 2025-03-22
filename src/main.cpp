@@ -151,7 +151,7 @@ bool get_mqtt_credentials();
 void check_mqtt_connection();
 bool reconnect();
 void process_sensors();
-void process_actuators();
+void process_servoTargetTimetors();
 void send_data_to_broker();
 void callback(char *topic, byte *payload, unsigned int length);
 void process_incoming_msg(String topic, String incoming);
@@ -161,9 +161,11 @@ void softAPConfig();
 void scanNetworks();
 void printStoredData();
 
-void handleSetTime(float time);
+void handleSetTime(float time, char *type);
 void handleServoOn();
 void handleServoOff();
+void handleReleOn();
+void handleReleOff();
 
 // Global Vars
 WiFiClient espclient;
@@ -193,16 +195,25 @@ void listFiles(File dir, int numTabs);
 
 Servo servo;
 // Variables para controlar el servo
-bool isServoOn = false;                 // Estado del servo (encendido/apagado)
-int targetTurns = 0;                    // Número de vueltas completas
-bool isTimedMode = false;               // Modo de tiempo activado
-float targetTime = 0.00;                // Tiempo en minutos
-unsigned long startTime = 0;            // Tiempo de inicio
-unsigned long irrigationTime = 0;       // Tiempo de inicio
-unsigned long irrigationTargetTime = 1; // horas tiempo de tiempo de riego
-unsigned long modoAPTime = 0;           // Variable estática para mantener el tiempo inicial
-bool triggerActivated = false;          // Bandera para detectar el primer cambio a LOW
+bool isServoOn = false;      // Estado del servo (encendido/apagado)
+bool isTimedMode = false;    // Modo de tiempo activado
+float targetTime = 0.00;     // Tiempo en minutos
+unsigned long startTime = 0; // Tiempo de inicio
+unsigned long servoTime = 0; // Tiempo de inicio
+bool triggerServoActivated = false;
+unsigned long servoTargetTime = 1; // horas tiempo de tiempo de riego
 
+// Variables para controlar el rele
+bool isReleOn = false;           // Estado del servo (encendido/apagado)
+bool isReleTimedMode = false;    // Modo de tiempo activado
+float targetReleTime = 0.00;     // Tiempo en minutos
+unsigned long startReleTime = 0; // Tiempo de inicio
+unsigned long releTime = 0;      // Tiempo de inicio
+bool triggerReleActivated = false;
+unsigned long releTargetTime = 1; // horas tiempo de tiempo de riego
+
+unsigned long modoAPTime = 0;  // Variable estática para mantener el tiempo inicial
+bool triggerActivated = false; // Bandera para detectar el primer cambio a LOW
 void setup()
 {
 
@@ -364,12 +375,18 @@ void loop()
   if (isTimedMode)
   {
     if (millis() - startTime >= targetTime * 60000)
-    {                      // Convertir minutos a milisegundos
-      isServoOn = false;   // Apagar el servo después del tiempo
-      isTimedMode = false; // Desactivar el modo de tiempo
-      servo.write(90);     // Volver a la posición de descanso (cerrado)
-      varsLastSend[1] = 0;
-      varsLastSend[4] = 0;
+    { // Convertir minutos a milisegundos
+      handleServoOff();
+      Serial.println("Tiempo terminado ");
+    }
+  }
+
+  // Controlar el servo en modo de tiempo
+  if (isReleTimedMode)
+  {
+    if (millis() - startReleTime >= targetReleTime * 60000)
+    { // Convertir minutos a milisegundos
+      handleReleOff();
       Serial.println("Tiempo terminado ");
     }
   }
@@ -511,14 +528,20 @@ void process_sensors()
     mqtt_data_doc["variables"][2]["last"]["save"] = 0;
     // Serial.println("Servo save off");
   }
+  // prev_temp = temp;
+  prev_status_rele = status_rele;
 
   if (isServoOn)
   {
-    // Calcular el tiempo transcurrido desde que el servo se activó
-    unsigned long elapsedTime = millis() - irrigationTime;
+    if (!triggerServoActivated)
+    {
+      // Primera vez que se detecta LOW
+      servoTime = millis();         // Guardar el tiempo inicial
+      triggerServoActivated = true; // Marcar que el trigger se activó
+    }
 
     // Si el tiempo transcurrido es mayor o igual al tiempo máximo permitido
-    if (elapsedTime >= irrigationTargetTime * 60 * 60000)
+    if (millis() - servoTime >= servoTargetTime * 60 * 60000)
     {
       // Desactivar el servo
       mqtt_data_doc["variables"][1]["last"]["value"] = 100;
@@ -529,14 +552,51 @@ void process_sensors()
       varsLastSend[4] = 0;
       // Aquí puedes agregar cualquier lógica adicional, como notificar por MQTT o Serial
       Serial.println("Servo desactivado por superar el tiempo máximo de activación");
+      triggerServoActivated = false; // Reiniciar la bandera después de ejecutar la función
 
       // Reiniciar el tiempo de riego (opcional, dependiendo de tu lógica)
-      irrigationTime = millis();
+      // servoTime = millis();
     }
   }
+  else
+  {
+    // Si el pin no está en LOW, reiniciar la bandera
+    triggerServoActivated = false;
+  }
 
-  // prev_temp = temp;
-  prev_status_rele = status_rele;
+  if (isReleOn)
+  {
+    if (!triggerReleActivated)
+    {
+      // Primera vez que se detecta LOW
+      releTime = millis();         // Guardar el tiempo inicial
+      triggerReleActivated = true; // Marcar que el trigger se activó
+    }
+
+    // Si el tiempo transcurrido es mayor o igual al tiempo máximo permitido
+    if (millis() - releTime >= releTargetTime * 60 * 60000)
+    {
+      // Desactivar el servo
+      mqtt_data_doc["variables"][2]["last"]["value"] = 100;
+      mqtt_data_doc["variables"][2]["last"]["save"] = 1;
+      isReleOn = false;        // Apagar el servo después del tiempo
+      isReleTimedMode = false; // Desactivar el modo de tiempo
+      digitalWrite(PIN_RELE, HIGH);
+      varsLastSend[7] = 0;
+      varsLastSend[2] = 0;
+      // Aquí puedes agregar cualquier lógica adicional, como notificar por MQTT o Serial
+      Serial.println("Rele desactivado por superar el tiempo máximo de activación");
+      triggerReleActivated = false; // Reiniciar la bandera después de ejecutar la función
+
+      // Reiniciar el tiempo de riego (opcional, dependiendo de tu lógica)
+      // servoTime = millis();
+    }
+  }
+  else
+  {
+    // Si el pin no está en LOW, reiniciar la bandera
+    triggerReleActivated = false;
+  }
 
   mqtt_data_doc["variables"][4]["last"]["value"] = (true == isServoOn);
   mqtt_data_doc["variables"][7]["last"]["value"] = (LOW == digitalRead(PIN_RELE));
@@ -546,8 +606,8 @@ void process_actuators()
 {
   // Imprimir el objeto JSON en el Monitor Serial
 
-  serializeJson(mqtt_data_doc, Serial); // Imprime el JSON en la consola
-  Serial.println();                     // Agrega un salto de línea
+  // serializeJson(mqtt_data_doc, Serial); // Imprime el JSON en la consola
+  // Serial.println();                     // Agrega un salto de línea
   if (mqtt_data_doc["variables"][3]["last"]["value"] == "on")
   {
     digitalWrite(PIN_LED, HIGH);
@@ -555,8 +615,8 @@ void process_actuators()
     handleServoOn();
     Serial.println("Process Actuators [3]: on ");
     mqtt_data_doc["variables"][3]["last"]["value"] = "";
-    varsLastSend[4] = 0;
-    varsLastSend[1] = 0;
+    // varsLastSend[4] = 0;
+    // varsLastSend[1] = 0;
   }
   else if (mqtt_data_doc["variables"][5]["last"]["value"] == "off")
   {
@@ -566,33 +626,36 @@ void process_actuators()
     Serial.println("Process Actuators [5]: off ");
 
     mqtt_data_doc["variables"][5]["last"]["value"] = "";
-    varsLastSend[4] = 0;
-    varsLastSend[1] = 0;
+    // varsLastSend[4] = 0;
+    // varsLastSend[1] = 0;
   }
 
   else if (mqtt_data_doc["variables"][6]["last"]["value"] == "on")
   {
-    digitalWrite(PIN_RELE, LOW);
+    handleReleOn();
+    // digitalWrite(PIN_RELE, LOW);
     Serial.println("Process Actuators [6]: on ");
 
     mqtt_data_doc["variables"][6]["last"]["value"] = "";
-    varsLastSend[7] = 0;
-    varsLastSend[2] = 0;
+    // varsLastSend[7] = 0;
+    // varsLastSend[2] = 0;
   }
   else if (mqtt_data_doc["variables"][8]["last"]["value"] == "off")
   {
-    digitalWrite(PIN_RELE, HIGH);
+    // digitalWrite(PIN_RELE, HIGH);
+    handleReleOff();
     Serial.println("Process Actuators [8]: off ");
 
     mqtt_data_doc["variables"][8]["last"]["value"] = "";
-    varsLastSend[7] = 0;
-    varsLastSend[2] = 0;
+    // varsLastSend[7] = 0;
+    // varsLastSend[2] = 0;
   }
 
   else if (mqtt_data_doc["variables"][9]["last"]["value"] > 0)
   {
     float time = mqtt_data_doc["variables"][9]["last"]["value"]; // Extraer el valor
-    handleSetTime(time);
+    char *type = "servo";
+    handleSetTime(time, type);
     serializeJson(mqtt_data_doc["variables"][9]["last"]["value"], Serial); // Imprime el JSON en la consola
 
     // Llamar a la función con el valor    // digitalWrite(PIN_RELE, HIGH);
@@ -600,8 +663,20 @@ void process_actuators()
 
     Serial.println("Process Actuators [9]:  Exito ");
     // Serial.println("Tiempo " + String(time));
+  }
 
-    varsLastSend[10] = 0;
+  else if (mqtt_data_doc["variables"][10]["last"]["value"] > 0)
+  {
+    float time = mqtt_data_doc["variables"][10]["last"]["value"]; // Extraer el valor
+    char *type = "rele";
+    handleSetTime(time, type);
+    serializeJson(mqtt_data_doc["variables"][9]["last"]["value"], Serial); // Imprime el JSON en la consola
+
+    // Llamar a la función con el valor    // digitalWrite(PIN_RELE, HIGH);
+    mqtt_data_doc["variables"][10]["last"]["value"] = "";
+
+    Serial.println("Process Actuators [10]:  Exito ");
+    // Serial.println("Tiempo " + String(time));
   }
 }
 
@@ -1041,9 +1116,11 @@ void scanNetworks()
 void handleServoOn()
 {
   isServoOn = true;
-  isTimedMode = false; // Desactivar el modo de tiempo
-  servo.write(180);    // Mover el servo a 180 grados (abierto)
+  // isTimedMode = false; // Desactivar el modo de tiempo
+  servo.write(180); // Mover el servo a 180 grados (abierto)
   // server.send(200, "text/plain", "Servo encendido");
+  varsLastSend[1] = 0;
+  varsLastSend[4] = 0;
 }
 
 // Apagar el servo
@@ -1053,21 +1130,59 @@ void handleServoOff()
   isTimedMode = false; // Desactivar el modo de tiempo
   servo.write(90);     // Volver a la posición de descanso (cerrado)
   // server.send(200, "text/plain", "Servo apagado");
+  varsLastSend[1] = 0;
+  varsLastSend[4] = 0;
+}
+
+// Encender el servo
+void handleReleOn()
+{
+  isReleOn = true;
+  // isTimedMode = false; // Desactivar el modo de tiempo
+  digitalWrite(PIN_RELE, LOW);
+  // server.send(200, "text/plain", "Servo encendido");
+  varsLastSend[7] = 0;
+  varsLastSend[2] = 0;
+}
+
+// Apagar el servo
+void handleReleOff()
+{
+  isReleOn = false;
+  isReleTimedMode = false; // Desactivar el modo de tiempo
+  digitalWrite(PIN_RELE, HIGH);
+  // server.send(200, "text/plain", "Servo apagado");
+  varsLastSend[7] = 0;
+  varsLastSend[2] = 0;
 }
 
 // Establecer el tiempo en minutos
-void handleSetTime(float time)
+void handleSetTime(float time, char *type)
 {
   if (time > 0.00)
   {
-    targetTime = time;    // Establecer el tiempo en minutos
-    isServoOn = true;     // Encender el servo
-    isTimedMode = true;   // Activar el modo de tiempo
-    startTime = millis(); // Registrar el tiempo de inicio
-    servo.write(180);     // Mover el servo a 180 grados (abierto)
-    Serial.println("Tiempo establecido: " + String(targetTime) + " minutos");
-    varsLastSend[1] = 0;
-    varsLastSend[4] = 0;
+    if (type == "servo")
+    {
+
+      targetTime = time; // Establecer el tiempo en minutos
+      // isServoOn = true;     // Encender el servo
+      isTimedMode = true;   // Activar el modo de tiempo
+      startTime = millis(); // Registrar el tiempo de inicio
+      // servo.write(180);     // Mover el servo a 180 grados (abierto)
+      Serial.println("Servo Activado Tiempo establecido: " + String(targetTime) + " minutos");
+      handleServoOn();
+    }
+
+    if (type == "rele")
+    {
+
+      targetReleTime = time;    // Establecer el tiempo en minutos
+      isReleOn = true;          // Encender el servo
+      isReleTimedMode = true;   // Activar el modo de tiempo
+      startReleTime = millis(); // Registrar el tiempo de inicio
+      Serial.println("Rele activado Tiempo establecido: " + String(targetTime) + " minutos");
+      handleReleOn();
+    }
   }
   else
   {
